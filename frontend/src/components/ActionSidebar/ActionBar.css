@@ -1,0 +1,85 @@
+.action-bar-container {
+  width: 100%;
+  background-color: rgb(52, 52, 52);
+  height: 729.5px;
+  display: grid;
+  grid-template-rows: 55px 45px;
+  border-left: 2px solid burlywood;
+}
+.action-btn {
+  background-color: rgb(38, 38, 38);
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: auto;
+}
+.action-btn button {
+  padding: 6px 10px;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: 500;
+  font-family: sans-serif;
+}
+.result {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 16px;
+  font-family: sans-serif;
+  font-weight: 600;
+  background-color: #e9ecef;
+}
+.result #cross {
+  height: 30px;
+  width: 30px;
+  border: none;
+  background-color: transparent;
+  color: rgb(10, 10, 10);
+  font-size: 16px;
+}
+.result p {
+  padding-top: 17px;
+  padding-left: 20px;
+  color: rgb(21, 174, 7);
+}
+.result input {
+  margin-left: 20px;
+  padding-left: 10px;
+  height: 30px;
+  border-radius: 5px;
+}
+.result .create-input {
+  border: 2px dashed blue;
+}
+.result .create-btn {
+  background-color: transparent;
+  border-radius: 50%;
+  padding-left: 7px;
+  padding-right: 7px;
+  padding-top: 3px;
+  padding-bottom: 4px;
+  border: none;
+}
+.result .create-btn:hover {
+  border: 2px solid rgb(148, 146, 146);
+  background-color: #dad9d9;
+}
+.result .join-button {
+  padding: 1px 15px;
+  border: 1px solid blue;
+}
+.chats {
+  width: 100%;
+  background-color: #003049;
+  overflow-y: auto;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+.chats .chat-info {
+  display: flex;
+  width: 100%;
+  gap: 50px;
+  padding-left: 20px;
+  padding-top: 10px;
+}
