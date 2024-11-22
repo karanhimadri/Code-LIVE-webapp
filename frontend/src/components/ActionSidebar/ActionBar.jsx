@@ -1,8 +1,11 @@
-import React, { useContext, useEffect, useState } from "react";
-import { RxCrossCircled } from "react-icons/rx";
+import React, { useContext, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { FaPlus } from "react-icons/fa6";
-import { LuLogOut } from "react-icons/lu";
 import { IoCopyOutline } from "react-icons/io5";
+import { VscThreeBars } from "react-icons/vsc";
+import { HiMiniSignal } from "react-icons/hi2";
+import { IoLogOut } from "react-icons/io5";
 import "./ActionBar.css";
 import webSocketContext from "../../contexts/websocket";
 
@@ -11,6 +14,7 @@ const ActionBar = () => {
   const [joinRoomState, setJoinRoomState] = useState(false);
   const [leaveRoomButtonState, setLeaveRoomButtonState] = useState(false);
   const [joinRoomCode, setJoinRoomCode] = useState("");
+  const [showConnectionsState, setShowConnectionsState] = useState(false);
 
   const {
     messages,
@@ -19,43 +23,66 @@ const ActionBar = () => {
     handleRoomJoining,
     handleRoomLeaving,
     setGeneratingRoomID,
+    totalUser,
   } = useContext(webSocketContext);
 
   const handleCopy = () => {
     navigator.clipboard
-      .writeText(generatingRoomID)
-      .then(() => {})
-      .catch((err) => console.error("Failed to copy text:", err));
+      .writeText(generatingRoomID.trim())
+      .then(() => {
+        toast.info("Room Code copied!", { autoClose: 500 });
+      })
+      .catch(() => toast.error("Failed to copy text:"));
   };
 
   const handleCreateRoom = () => {
     // onclick create state button and code generation
+    toast.success("Room created successfully !!", { autoClose: 2000 });
+    handleRoomCreation();
     setCreateRoomState(true);
     setJoinRoomState(false);
-    handleRoomCreation();
+    setShowConnectionsState(false);
   };
 
   const handleJoinRoomState = () => {
     // onclick join state button
     setJoinRoomState(true);
     setCreateRoomState(false);
+    setShowConnectionsState(false);
+  };
+
+  const handleShowConnection = () => {
+    setShowConnectionsState(true);
+    setCreateRoomState(false);
+    setJoinRoomState(false);
   };
 
   const handleJoinRoomServer = () => {
     // handle join button
     if (joinRoomCode.trim() !== "") {
-      handleRoomJoining(joinRoomCode);
-      setLeaveRoomButtonState(true);
+      console.log(joinRoomCode);
+      handleRoomJoining(joinRoomCode)
+        .then((isJoined) => {
+          if (isJoined) {
+            toast.success("You Joined the Room", { autoClose: 2000 });
+            setLeaveRoomButtonState(true);
+            setJoinRoomState(false);
+            setShowConnectionsState(true);
+          }
+        })
+        .catch(() => console.log("ERROR in room joining"));
     }
   };
 
   const handleLeaveRoomBtn = () => {
+    toast.warn("Room leaved !!", { autoClose: 2000 });
     handleRoomLeaving(joinRoomCode);
     setJoinRoomCode(" ");
     setJoinRoomState(false);
     setCreateRoomState(false);
     setGeneratingRoomID("");
     setLeaveRoomButtonState(false);
+    setShowConnectionsState(false);
   };
 
   return (
@@ -79,21 +106,63 @@ const ActionBar = () => {
           Join room
         </button>
         {leaveRoomButtonState && (
-          <button
-            type="button"
-            className="btn btn-danger"
-            onClick={handleLeaveRoomBtn}
-          >
-            <LuLogOut />
-          </button>
+          <div className="three-bar">
+            <button
+              style={{ fontSize: "18px" }}
+              type="button"
+              className="btn btn-secondary"
+            >
+              <VscThreeBars />
+            </button>
+            <div className="three-bar-dropdown">
+              <ul
+                className="dropdown-menu d-block position-static mx-0 shadow w-220px "
+                data-bs-theme="light"
+              >
+                <li onClick={handleShowConnection}>
+                  <a
+                    className="dropdown-item d-flex gap-2 align-items-center"
+                    href="#"
+                  >
+                    <HiMiniSignal /> Show connection
+                  </a>
+                </li>
+                <li onClick={handleLeaveRoomBtn}>
+                  <a
+                    className="dropdown-item dropdown-item-danger d-flex gap-2 align-items-center"
+                    href="#"
+                  >
+                    <IoLogOut /> Leave Room
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
         )}
       </div>
 
       <div className="result">
-        {!createRoomState && !joinRoomState && (
+        {showConnectionsState && (
+          <div className="live-results">
+            <div className="live-video">
+              <video className="live-icon" autoPlay muted loop>
+                <source src="/images/signal.mp4" type="video/mp4" />
+              </video>
+            </div>
+            <div className="room-code">
+              <p className="p">Room Code </p>
+              <span>: {joinRoomCode}</span>
+            </div>
+            <div className="group-section">
+              <img src="/images/groups.png" alt="group" />
+              <button>{totalUser} Joined</button>
+            </div>
+          </div>
+        )}
+        {!createRoomState && !joinRoomState && !showConnectionsState && (
           <>
             <p style={{ color: "#03045e" }}>
-              <i>Hey, Wealcome to Code Live</i>
+              {<i>Hey, Wealcome to Code Live</i>}
             </p>
             <button id="cross"></button>
           </>
@@ -117,7 +186,7 @@ const ActionBar = () => {
               type="text"
               placeholder="Enter joining code"
               onChange={(e) => setJoinRoomCode(e.target.value)}
-              value={joinRoomCode}
+              value={joinRoomCode.trim()}
             />
             <button
               type="button"
@@ -128,6 +197,7 @@ const ActionBar = () => {
             </button>
           </>
         )}
+        <ToastContainer />
       </div>
 
       <div className="chats">

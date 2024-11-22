@@ -2,7 +2,7 @@ const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
 const cors = require("cors");
-const PORT = 808;
+const PORT = 8080;
 
 const app = express();
 const server = http.createServer(app);
@@ -44,7 +44,6 @@ io.on("connection", (socket) => {
     // Generate unique 6-character room code
     roomsDB.set(roomCode, { users: [] });
     socket.emit("successMessage", { msg: `✔ Room created successfully` });
-    socket.emit("successMessage", { msg: `✔ Share this Code : ${roomCode}` });
     console.log(`Room created: ${roomCode}`);
   });
 
@@ -57,6 +56,9 @@ io.on("connection", (socket) => {
       roomUsers.users.push(socket.id); // Add the user to the room's user list
       // Notify the joined user
       socket.emit("successMessage", { msg: `✔ You joined room: ${roomCode}` });
+      socket.emit("isJoinSucceess", 1);
+      socket.emit("countTotalUser", roomUsers.users.length);
+      socket.to(roomCode).emit("countTotalUser", roomUsers.users.length);
       // Notify other users in the room that a new user joined
       socket
         .to(roomCode)
@@ -64,6 +66,7 @@ io.on("connection", (socket) => {
       console.log(`User ${socket.id} joined room: ${roomCode}`);
       console.log(roomsDB);
     } else {
+      socket.emit("isJoinSucceess", 0);
       socket.emit("errorMessage", { msg: `❌ Room not found!` });
     }
   });
@@ -85,7 +88,9 @@ io.on("connection", (socket) => {
       // 1. check roomCode is exits in DB or not
       socket.leave(roomCode); // 2. if exist then leave the user from room
       const thisRoom = roomsDB.get(roomCode); // get users's array which associated with roomCode
-      thisRoom.users = thisRoom.users.filter((id) => id !== socket.id); // remove the user id from array
+      thisRoom.users = thisRoom.users.filter((id) => id !== socket.id);
+      socket.emit("countTotalUser", thisRoom.users.length);
+      socket.to(roomCode).emit("countTotalUser", thisRoom.users.length); // remove the user id from array
       if (thisRoom.users.length === 0) {
         // check all user are leave or not
         roomsDB.delete(roomCode); // If leave, then delete the users's array which associated with roomCode

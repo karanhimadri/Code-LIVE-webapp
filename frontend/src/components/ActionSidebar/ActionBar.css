@@ -13,6 +13,18 @@
   align-items: center;
   padding: auto;
 }
+.action-btn .three-bar {
+  position: relative;
+}
+.three-bar .three-bar-dropdown {
+  display: none;
+}
+.three-bar:hover .three-bar-dropdown {
+  display: block;
+  position: absolute;
+  left: -100px;
+  z-index: 100;
+}
 .action-btn button {
   padding: 6px 10px;
   border-radius: 5px;
@@ -27,7 +39,63 @@
   font-size: 16px;
   font-family: sans-serif;
   font-weight: 600;
-  background-color: #e9ecef;
+  background-color: white;
+  border-right: 4px solid #003049;
+  border-radius: 0 5px 5px 0;
+}
+.result .live-results {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: space-evenly;
+  position: relative;
+}
+.live-results .live-video video {
+  width: 30px;
+  height: 35px;
+  border: none;
+}
+.live-results .live-video {
+  padding-top: 5px;
+  padding-left: 20px;
+}
+.live-results .room-code {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 15px;
+}
+.room-code .p {
+  color: #003049;
+  font-family: sans-serif;
+  font-weight: 400;
+  color: #22223b;
+}
+.room-code span {
+  font-family: sans-serif;
+  font-weight: 600;
+  color: #415a77;
+}
+.group-section {
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+  position: absolute;
+  left: 280px;
+}
+.live-results .group-section img {
+  width: 30px;
+  height: 30px;
+}
+.group-section button {
+  height: 30px;
+  width: 90px;
+  padding: 3px 10px;
+  border: none;
+  background-color: rgb(255, 255, 255);
+  font-size: 16px;
+  font-family: sans-serif;
+  color: rgb(4, 72, 111);
 }
 .result #cross {
   height: 30px;

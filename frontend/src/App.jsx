@@ -2,7 +2,6 @@ import React from "react";
 import Layout from "./Layout";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import AceEditorComponent from "./components/AceEditorSetup/AceEditorComponent";
 import CodeEditor from "./Pages/CodeEditorPage/CodeEditor";
 import Homepage from "./Pages/HomePage/Homepage";
 

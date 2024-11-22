@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import webSocketContext from "./websocket";
 
@@ -11,16 +11,17 @@ const WebSocketProvider = ({ children }) => {
   const [updatedCode, setUpdatedCode] = useState(
     "console.log('Hello, Welcome to CodeLive')"
   );
+  const [totalUser, setTotalUser] = useState(0);
 
-  function generateCode() {
-    const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const generateCode = useCallback(() => {
+    const characters = "ABCDEFGHIKMPSTWXY0123456789";
     return Array.from({ length: 6 }, () =>
       characters.charAt(Math.floor(Math.random() * characters.length))
     ).join("");
-  }
+  }, []);
 
   useEffect(() => {
-    const socketInstance = io(URL);
+    const socketInstance = io("http://localhost:8080");
     setSocket(socketInstance);
 
     socketInstance.emit("messageFromClient", "Himadri");
@@ -41,10 +42,19 @@ const WebSocketProvider = ({ children }) => {
       setMessages((prevMessages) => [...prevMessages, msg]);
     });
 
+    socketInstance.on("codeUpdate", (server_code) => {
+      setUpdatedCode(server_code);
+    });
+
+    socketInstance.on("countTotalUser", (count) => {
+      setTotalUser(count);
+    });
+
     return () => {
       socketInstance.disconnect(); // Cleanup on unmount
     };
   }, []);
+
 
   const handleCodeFromAceEditor = (newCode) => {
     setUpdatedCode(newCode);
@@ -54,31 +64,27 @@ const WebSocketProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    const handleCodeUpdate = (server_code) => {
-      // Update the local state with the received code
-      setUpdatedCode(server_code);
-    };
-    socket?.on("codeUpdate", handleCodeUpdate);
-
-    return () => {
-      socket?.off("codeUpdate", handleCodeUpdate);
-    };
-  }, [socket]);
-
   const handleRoomCreation = () => {
     if (!generatingRoomID) {
       const roomCode = generateCode();
       setGeneratingRoomID(roomCode);
-
       // Emit event to server to create room
       socket?.emit("createRoom", roomCode);
     }
   };
 
   const handleRoomJoining = (joinRoomCode) => {
-    socket?.emit("joinRoom", joinRoomCode);
-    setRoomCode(joinRoomCode);
+    return new Promise((resolve, reject) => {
+      socket?.emit("joinRoom", joinRoomCode);
+      socket.on("isJoinSucceess", (response) => {
+        if (response === 1) {
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      });
+      setRoomCode(joinRoomCode);
+    });
   };
 
   const handleRoomLeaving = (roomCode) => {
@@ -97,6 +103,7 @@ const WebSocketProvider = ({ children }) => {
         setGeneratingRoomID,
         updatedCode,
         handleCodeFromAceEditor,
+        totalUser
       }}
     >
       {children}
