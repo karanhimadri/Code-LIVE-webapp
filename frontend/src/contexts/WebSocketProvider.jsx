@@ -3,6 +3,7 @@ import { io } from "socket.io-client";
 import webSocketContext from "./websocket";
 
 const WebSocketProvider = ({ children }) => {
+  const URL = import.meta.env.VITE_BACKEND_URL;
   const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([{ msg: " " }]);
   const [generatingRoomID, setGeneratingRoomID] = useState("");
@@ -19,9 +20,7 @@ const WebSocketProvider = ({ children }) => {
   }
 
   useEffect(() => {
-    const socketInstance = io(
-      "https://code-share-backend-at-railway-production.up.railway.app/"
-    );
+    const socketInstance = io(URL);
     setSocket(socketInstance);
 
     socketInstance.emit("messageFromClient", "Himadri");
