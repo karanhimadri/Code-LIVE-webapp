@@ -21,7 +21,7 @@ const WebSocketProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    const socketInstance = io("http://localhost:8080");
+    const socketInstance = io(URL);
     setSocket(socketInstance);
 
     socketInstance.emit("messageFromClient", "Himadri");
