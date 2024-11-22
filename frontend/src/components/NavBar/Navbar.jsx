@@ -1,61 +1,72 @@
 import React from "react";
 import { VscThreeBars } from "react-icons/vsc";
 import "./Navbar.css";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   return (
     <div className="navbar-container">
       <div className="container">
-        <header className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between     py-3 mb-4 border-bottom">
-          <div className="col-md-3 mb-2 mb-md-0 ">
-            <a
-              href="/"
+        <header className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+          <div className="col-md-3 mb-2 mb-md-0 navbar-holder">
+            <Link
+              to="/"
               className="d-inline-flex link-body-emphasis text-decoration-none logo"
             >
+              <div className="logo-holder">
+                <img src="/live-streaming.png" alt="logo" />
+              </div>
               <div>
-                <h3 style={{ color: "black" }}>CodeShare</h3>
+                <h3 style={{ color: "black", fontFamily: "Impact, fantasy" }}>
+                  CodeLIVE
+                </h3>
                 <p>
-                  <span>Share Code</span>
-                  <b> LIVE </b>
-                  <span>with Developers</span>
+                  <span style={{ fontWeight: "600" }}>Code</span>
+                  <b> LIVE, </b>
+                  <span style={{ fontWeight: "600" }}>
+                    Build Faster Together!
+                  </span>
                 </p>
               </div>
-            </a>
+            </Link>
           </div>
 
-          <ul className="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+          <ul className="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0 hk-nav-gesture">
             <li>
-              <a href="#" className="nav-link px-2 link-secondary">
+              <Link to="/" className="nav-link px-2 link-secondary">
                 Home
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="nav-link px-2">
+              <Link to="/" className="nav-link px-2">
                 Features
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="nav-link px-2">
+              <Link to="/" className="nav-link px-2">
                 Pricing
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="nav-link px-2">
+              <Link to="/" className="nav-link px-2">
                 FAQs
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="nav-link px-2">
+              <Link to="/" className="nav-link px-2">
                 About
-              </a>
+              </Link>
             </li>
           </ul>
 
           <div className="col-md-3 text-end navber-buttons">
-            <button type="button" className="btn btn-outline-primary me-2 login-btn">
+            <button
+              type="button"
+              className="btn btn-outline-primary me-2 login-btn"
+            >
               Login
             </button>
-            <button type="button" className="btn btn-primary signup-btn">
+            <button type="button" className="btn btn-primary signup-btns">
               Sign-up
             </button>
             <div>

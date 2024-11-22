@@ -3,12 +3,13 @@ import { io } from "socket.io-client";
 import webSocketContext from "./websocket";
 
 const WebSocketProvider = ({ children }) => {
-  const [name, setName] = useState("Hello, Its working");
   const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([{ msg: " " }]);
   const [generatingRoomID, setGeneratingRoomID] = useState("");
   const [roomCode, setRoomCode] = useState("");
-  const [updatedCode, setUpdatedCode] = useState(" // Hello, CodeLive");
+  const [updatedCode, setUpdatedCode] = useState(
+    "console.log('Hello, Welcome to CodeLive')"
+  );
 
   function generateCode() {
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -18,7 +19,9 @@ const WebSocketProvider = ({ children }) => {
   }
 
   useEffect(() => {
-    const socketInstance = io("http://localhost:808");
+    const socketInstance = io(
+      "https://code-share-backend-at-railway-production.up.railway.app/"
+    );
     setSocket(socketInstance);
 
     socketInstance.emit("messageFromClient", "Himadri");
@@ -57,17 +60,13 @@ const WebSocketProvider = ({ children }) => {
       // Update the local state with the received code
       setUpdatedCode(server_code);
     };
-  
-    // Listen for 'codeUpdate' event to receive code updates from the server
     socket?.on("codeUpdate", handleCodeUpdate);
-  
-    // Clean up the event listener when the component unmounts
+
     return () => {
       socket?.off("codeUpdate", handleCodeUpdate);
     };
   }, [socket]);
 
-  
   const handleRoomCreation = () => {
     if (!generatingRoomID) {
       const roomCode = generateCode();
@@ -91,8 +90,6 @@ const WebSocketProvider = ({ children }) => {
   return (
     <webSocketContext.Provider
       value={{
-        name,
-        setName,
         messages,
         generatingRoomID,
         handleRoomCreation,

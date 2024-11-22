@@ -16,6 +16,12 @@
   display: flex;
   gap: 5px;
 }
+.logo .logo-holder {
+  margin-right: 20px;
+}
+.logo .logo-holder img {
+  width: 60px;
+}
 .container .three-bar {
   padding-bottom: 9px;
   border-radius: 50%;
@@ -23,6 +29,7 @@
   background-color: white;
   color: black;
   border: none;
+  display: none;
 }
 .navber-buttons {
   display: flex;
