@@ -4,7 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import AceEditorComponent from "./components/AceEditorSetup/AceEditorComponent";
 import CodeEditor from "./Pages/CodeEditorPage/CodeEditor";
-import Homepage from "./Pages/HomePage/HomePage";
+import Homepage from "./Pages/HomePage/Homepage";
 
 const App = () => {
   return (
