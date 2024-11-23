@@ -36,14 +36,13 @@ io.on("connection", (socket) => {
 
   // Client connection validation
   socket.on("messageFromClient", (data) => {
-    socket.emit("validateConnection", { msg: `✔ ${data} you are connected` });
+    socket.emit("validateConnection", `✔ ${data} you are connected`);
   });
 
   // Create a new room
   socket.on("createRoom", (roomCode) => {
     // Generate unique 6-character room code
     roomsDB.set(roomCode, { users: [] });
-    socket.emit("successMessage", { msg: `✔ Room created successfully` });
     console.log(`Room created: ${roomCode}`);
   });
 
@@ -55,19 +54,16 @@ io.on("connection", (socket) => {
       const roomUsers = roomsDB.get(roomCode);
       roomUsers.users.push(socket.id); // Add the user to the room's user list
       // Notify the joined user
-      socket.emit("successMessage", { msg: `✔ You joined room: ${roomCode}` });
       socket.emit("isJoinSucceess", 1);
       socket.emit("countTotalUser", roomUsers.users.length);
       socket.to(roomCode).emit("countTotalUser", roomUsers.users.length);
       // Notify other users in the room that a new user joined
-      socket
-        .to(roomCode)
-        .emit("userJoined", { msg: `A new user has joined the room!` });
+      socket.to(roomCode).emit("userJoined", `A new user has joined the room!`);
       console.log(`User ${socket.id} joined room: ${roomCode}`);
       console.log(roomsDB);
     } else {
       socket.emit("isJoinSucceess", 0);
-      socket.emit("errorMessage", { msg: `❌ Room not found!` });
+      socket.emit("errorMessage", `❌ Room not found!`);
     }
   });
 
@@ -83,6 +79,15 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("msgFromClient", ({ roomCode, msg }) => {
+    if (roomsDB.has(roomCode)) {
+      if (typeof msg === "object") {
+        msg = JSON.stringify(msg); // Convert object to string if it's not already a string
+      }
+      socket.to(roomCode).emit("msgFromServer", msg);
+    }
+  });
+
   socket.on("leaveRoom", (roomCode) => {
     if (roomsDB.has(roomCode)) {
       // 1. check roomCode is exits in DB or not
@@ -95,15 +100,10 @@ io.on("connection", (socket) => {
         // check all user are leave or not
         roomsDB.delete(roomCode); // If leave, then delete the users's array which associated with roomCode
         console.log("Room Deleted", roomCode);
-        socket.emit("successMessage", { msg: "✔ No one has at the Room " });
 
-        socket.emit("successMessage", { msg: "✔ So Room was Deleted !." });
+        socket.emit("successMessage", "✔ So Room was Deleted !.");
       } else {
-        // If not , mean other users are still in room , then
-        socket.emit("successMessage", { msg: "✔ You leaved the room ." });
-        socket
-          .to(roomCode)
-          .emit("successMessage", { msg: "✔ A user left the room" }); // notified a user left
+        socket.to(roomCode).emit("successMessage", "✔ A user left the room"); // notified a user left
       }
     }
   });

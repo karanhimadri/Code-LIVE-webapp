@@ -22,7 +22,7 @@ const AceEditorComponent = () => {
         showPrintMargin={false}
         onChange={handleCodeFromAceEditor}
         editorProps={{ $blockScrolling: true }}
-        style={{ width: "100%", height: "100vh" }}
+        style={{ width: "100%", height: "590px" }}
         readOnly={false}
         setOptions={{
           useWorker: false, // Disable the worker (might affect performance/features)

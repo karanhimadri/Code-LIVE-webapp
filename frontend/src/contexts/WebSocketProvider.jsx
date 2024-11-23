@@ -5,7 +5,9 @@ import webSocketContext from "./websocket";
 const WebSocketProvider = ({ children }) => {
   const URL = import.meta.env.VITE_BACKEND_URL;
   const [socket, setSocket] = useState(null);
-  const [messages, setMessages] = useState([{ msg: " " }]);
+  const [messages, setMessages] = useState([
+    { local: false, msg: "Hello Lets create" },
+  ]);
   const [generatingRoomID, setGeneratingRoomID] = useState("");
   const [roomCode, setRoomCode] = useState("");
   const [updatedCode, setUpdatedCode] = useState(
@@ -27,19 +29,31 @@ const WebSocketProvider = ({ children }) => {
     socketInstance.emit("messageFromClient", "Himadri");
 
     socketInstance.on("validateConnection", (message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { local: false, msg: message },
+      ]);
     });
 
     socketInstance.on("successMessage", (msg) => {
-      setMessages((prevMessages) => [...prevMessages, msg]);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { local: false, msg: msg },
+      ]);
     });
 
     socketInstance.on("userJoined", (msg) => {
-      setMessages((prevMessages) => [...prevMessages, msg]);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { local: false, msg: msg },
+      ]);
     });
 
     socketInstance.on("errorMessage", (msg) => {
-      setMessages((prevMessages) => [...prevMessages, msg]);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { local: false, msg: msg },
+      ]);
     });
 
     socketInstance.on("codeUpdate", (server_code) => {
@@ -50,11 +64,25 @@ const WebSocketProvider = ({ children }) => {
       setTotalUser(count);
     });
 
+    socketInstance.on("msgFromServer", (message) => {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { local: false, msg: message },
+      ]);
+    });
+
     return () => {
       socketInstance.disconnect(); // Cleanup on unmount
     };
   }, []);
 
+  const handleLocalMessage = (message) => {
+    socket?.emit("msgFromClient", { roomCode, msg: message });
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { local: true, msg: message },
+    ]);
+  };
 
   const handleCodeFromAceEditor = (newCode) => {
     setUpdatedCode(newCode);
@@ -103,7 +131,8 @@ const WebSocketProvider = ({ children }) => {
         setGeneratingRoomID,
         updatedCode,
         handleCodeFromAceEditor,
-        totalUser
+        totalUser,
+        handleLocalMessage,
       }}
     >
       {children}

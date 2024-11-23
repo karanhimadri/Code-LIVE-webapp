@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaPlus } from "react-icons/fa6";
@@ -6,6 +6,7 @@ import { IoCopyOutline } from "react-icons/io5";
 import { VscThreeBars } from "react-icons/vsc";
 import { HiMiniSignal } from "react-icons/hi2";
 import { IoLogOut } from "react-icons/io5";
+import { IoSendSharp } from "react-icons/io5";
 import "./ActionBar.css";
 import webSocketContext from "../../contexts/websocket";
 
@@ -15,6 +16,8 @@ const ActionBar = () => {
   const [leaveRoomButtonState, setLeaveRoomButtonState] = useState(false);
   const [joinRoomCode, setJoinRoomCode] = useState("");
   const [showConnectionsState, setShowConnectionsState] = useState(false);
+  const [isUserRoomJoined, setIsUserRoomJoined] = useState(false);
+  const [newMessage, setNewMessage] = useState("");
 
   const {
     messages,
@@ -24,20 +27,39 @@ const ActionBar = () => {
     handleRoomLeaving,
     setGeneratingRoomID,
     totalUser,
+    handleLocalMessage,
   } = useContext(webSocketContext);
+  const chatContainerRef = useRef(null); // Reference for chat container
+
+  useEffect(() => {
+    // Scroll to the bottom of the chat container whenever the messages change
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  const handleSendMessageBtn = () => {
+    if (newMessage.trim() !== "") {
+      handleLocalMessage(newMessage);
+      setNewMessage("");
+    }
+  };
 
   const handleCopy = () => {
     navigator.clipboard
       .writeText(generatingRoomID.trim())
       .then(() => {
-        toast.info("Room Code copied!", { autoClose: 500 });
+        toast.info("Room Code copied!", { autoClose: 400 });
       })
       .catch(() => toast.error("Failed to copy text:"));
   };
 
   const handleCreateRoom = () => {
     // onclick create state button and code generation
-    toast.success("Room created successfully !!", { autoClose: 2000 });
+    if (generatingRoomID.trim() === "") {
+      toast.success("Room created successfully !!", { autoClose: 500 });
+    }
     handleRoomCreation();
     setCreateRoomState(true);
     setJoinRoomState(false);
@@ -60,22 +82,27 @@ const ActionBar = () => {
   const handleJoinRoomServer = () => {
     // handle join button
     if (joinRoomCode.trim() !== "") {
-      console.log(joinRoomCode);
-      handleRoomJoining(joinRoomCode)
-        .then((isJoined) => {
-          if (isJoined) {
-            toast.success("You Joined the Room", { autoClose: 2000 });
-            setLeaveRoomButtonState(true);
-            setJoinRoomState(false);
-            setShowConnectionsState(true);
-          }
-        })
-        .catch(() => console.log("ERROR in room joining"));
+      if (!isUserRoomJoined) {
+        console.log(joinRoomCode);
+        handleRoomJoining(joinRoomCode)
+          .then((isJoined) => {
+            if (isJoined) {
+              toast.success("You Joined the Room", { autoClose: 2000 });
+              setIsUserRoomJoined(true);
+              setLeaveRoomButtonState(true);
+              setJoinRoomState(false);
+              setShowConnectionsState(true);
+            }
+          })
+          .catch(() => console.log("ERROR in room joining"));
+      } else {
+        toast.warn("You are already joined in a room.");
+      }
     }
   };
 
   const handleLeaveRoomBtn = () => {
-    toast.warn("Room leaved !!", { autoClose: 2000 });
+    toast.warn("Room leaved !!", { autoClose: 1500 });
     handleRoomLeaving(joinRoomCode);
     setJoinRoomCode(" ");
     setJoinRoomState(false);
@@ -83,6 +110,7 @@ const ActionBar = () => {
     setGeneratingRoomID("");
     setLeaveRoomButtonState(false);
     setShowConnectionsState(false);
+    setIsUserRoomJoined(false);
   };
 
   return (
@@ -201,18 +229,37 @@ const ActionBar = () => {
       </div>
 
       <div className="chats">
-        {messages.length === 0
-          ? " "
-          : messages
-              .slice()
-              .reverse()
-              .map((item, index) => (
-                <div key={index} className="chat-info">
-                  <p>
-                    <i>{item.msg}</i>
+        <div className="chat-info" ref={chatContainerRef}>
+          {messages?.length === 0 ? (
+            <p>No message yet.</p>
+          ) : (
+            messages?.map((item, index) => (
+              <div key={index} className="msg">
+                {item?.local ? (
+                  <p className="my-msg">
+                    <i>{item?.msg || "invaild message !!"}</i>
                   </p>
-                </div>
-              ))}
+                ) : (
+                  <p className="other-msg">
+                    <i>{item?.msg || "invaild message !!"}</i>
+                  </p>
+                )}
+              </div>
+            ))
+          )}
+        </div>
+        <div className="chat-input">
+          <textarea
+            type="text"
+            placeholder="write message ..."
+            spellCheck={false}
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+          />
+          <button onClick={handleSendMessageBtn}>
+            <IoSendSharp />
+          </button>
+        </div>
       </div>
     </div>
   );
